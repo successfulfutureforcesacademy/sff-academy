@@ -137,6 +137,19 @@
       align-items: flex-start;
       margin-bottom: 1.5rem;
     }
+    .db-status {
+      padding: 0.5rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+    .db-status.checking { background:#f0f0f0; color:#666; }
+    .db-status.ok       { background:#d4edda; color:#155724; }
+    .db-status.fail     { background:#f8d7da; color:#721c24; }
     @media (max-width: 768px) {
       .login-page { grid-template-columns: 1fr; }
       .login-panel-left { padding: 2.5rem 1.5rem; min-height: 260px; }
@@ -165,6 +178,9 @@
     <h2 class="login-heading">Student Login</h2>
     <p class="login-sub-heading">Enter your registered name and phone number to access your test.</p>
 
+    <!-- Live DB connection status -->
+    <div id="db-status" class="db-status checking">⏳ Checking database connection…</div>
+
     <div class="info-strip">
       ℹ️ <span>Make sure you type your name and phone number <strong>exactly</strong> as registered with your coordinator.</span>
     </div>
@@ -186,7 +202,8 @@
           <input class="form-input" type="tel" id="student-phone" placeholder="e.g. 03001234567" required />
         </div>
       </div>
-      <button class="btn btn-primary w-full" type="submit" id="login-btn" style="justify-content:center; padding:1rem; font-size:1rem; margin-top:0.25rem;">
+      <button class="btn btn-primary w-full" type="submit" id="login-btn"
+        style="justify-content:center; padding:1rem; font-size:1rem; margin-top:0.25rem;">
         Verify & Start Test →
       </button>
     </form>
@@ -203,8 +220,34 @@
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
 <script>
+  // Redirect if already logged in
   if (Auth.getSession()) window.location.href = "pages/test.html";
 
+  // ── Live DB connection check ─────────────────────────────
+  const dbStatus = document.getElementById("db-status");
+
+  async function checkDB() {
+    try {
+      const { error } = await supabase
+        .from("students")
+        .select("id")
+        .limit(1);
+
+      if (error) {
+        dbStatus.className = "db-status fail";
+        dbStatus.textContent = "❌ Database error: " + error.message;
+      } else {
+        dbStatus.className = "db-status ok";
+        dbStatus.textContent = "✅ Database connected";
+      }
+    } catch (e) {
+      dbStatus.className = "db-status fail";
+      dbStatus.textContent = "❌ Cannot reach database: " + e.message;
+    }
+  }
+  checkDB();
+
+  // ── Login Form ───────────────────────────────────────────
   const form    = document.getElementById("login-form");
   const btn     = document.getElementById("login-btn");
   const alertEl = document.getElementById("alert-box");
@@ -235,7 +278,7 @@
       Auth.saveSession(result.student);
       window.location.href = "pages/test.html";
     } catch (err) {
-      showAlert("error", "Connection error. Please check your internet and try again.");
+      showAlert("error", "Connection error: " + err.message);
       btn.disabled = false;
       btn.textContent = "Verify & Start Test →";
     }
