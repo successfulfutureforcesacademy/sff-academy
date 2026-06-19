@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — Successful Future Forces Academy</title>
+  <link rel="stylesheet" href="../css/design.css" />
+  <style>
+    .admin-page { max-width: 1020px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+      gap: 1rem; margin-bottom: 2rem;
+    }
+    .admin-stat {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius-md); padding:1.25rem;
+    }
+    .as-label { font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.4rem; }
+    .as-value { font-size:2rem; font-weight:700; color:var(--primary); }
+    .admin-lock { display:flex; align-items:center; justify-content:center; min-height:70vh; }
+    .sort-btn { background:none; border:none; cursor:pointer; font-size:0.8rem; font-weight:700; color:var(--text-muted); padding:0 3px; }
+    .sort-btn:hover { color:var(--primary); }
+  </style>
+</head>
+<body class="page-bg">
+
+<div class="brand-strip">
+  <div>
+    <div class="brand-name">Successful Future Forces Academy</div>
+    <div class="brand-sub">Admin Panel — Results Dashboard</div>
+  </div>
+  <button class="btn" id="refresh-btn" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.3);">↻ Refresh</button>
+</div>
+
+<!-- Password Lock -->
+<div class="admin-lock" id="admin-lock">
+  <div class="card" style="width:100%;max-width:400px;text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:1rem;">🔐</div>
+    <h2 style="font-family:var(--font-display);color:var(--primary);margin-bottom:0.4rem;">Admin Access</h2>
+    <p class="text-muted" style="font-size:0.9rem;margin-bottom:1.75rem;">Enter the admin password to view student results.</p>
+    <div class="form-group" style="margin-bottom:0.75rem;text-align:left;">
+      <label class="form-label">Password</label>
+      <input class="form-input" type="password" id="admin-pass" placeholder="Enter password" />
+    </div>
+    <div id="pass-alert" class="hidden alert alert-error" style="margin-bottom:1rem;"></div>
+    <button class="btn btn-primary w-full" id="admin-login-btn" style="justify-content:center;">Enter Dashboard →</button>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div class="admin-page hidden" id="admin-dashboard">
+
+  <div class="admin-grid">
+    <div class="admin-stat">
+      <div class="as-label">👥 Registered Students</div>
+      <div class="as-value" id="stat-registered">—</div>
+    </div>
+    <div class="admin-stat">
+      <div class="as-label">📝 Attempted Test</div>
+      <div class="as-value" id="stat-attempted">—</div>
+    </div>
+    <div class="admin-stat">
+      <div class="as-label">🏆 Highest Score</div>
+      <div class="as-value" style="color:var(--gold);" id="stat-highest">—</div>
+    </div>
+    <div class="admin-stat">
+      <div class="as-label">📊 Average Score</div>
+      <div class="as-value" id="stat-avg">—</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;">
+      <h3 style="font-family:var(--font-display);color:var(--primary);font-size:1.3rem;">Student Results & Rankings</h3>
+      <button class="btn btn-outline" id="export-csv" style="font-size:0.88rem;">⬇ Export CSV</button>
+    </div>
+
+    <div id="admin-loading" style="text-align:center;padding:2rem;">
+      <div class="spinner" style="margin:0 auto;"></div>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="lb-table" id="admin-table" style="display:none;">
+        <thead>
+          <tr>
+            <th>Rank <button class="sort-btn" data-col="rank">↕</button></th>
+            <th>Student Name</th>
+            <th>Phone</th>
+            <th>Score <button class="sort-btn" data-col="score">↕</button></th>
+            <th>Out of</th>
+            <th>% <button class="sort-btn" data-col="pct">↕</button></th>
+            <th>Submitted At</th>
+          </tr>
+        </thead>
+        <tbody id="admin-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/results.js"></script>
+<script>
+  // ── CHANGE THIS PASSWORD ──────────────────────────────────
+  const ADMIN_PASSWORD = "sff2025admin";
+
+  const medals = { 1:"🥇", 2:"🥈", 3:"🥉" };
+  let allData  = [];
+  let sortDir  = {};
+
+  if (sessionStorage.getItem("sff_admin") === ADMIN_PASSWORD) unlockAdmin();
+
+  document.getElementById("admin-login-btn").onclick = () => {
+    const val = document.getElementById("admin-pass").value;
+    if (val === ADMIN_PASSWORD) {
+      sessionStorage.setItem("sff_admin", ADMIN_PASSWORD);
+      unlockAdmin();
+    } else {
+      const el = document.getElementById("pass-alert");
+      el.textContent = "❌ Incorrect password. Please try again.";
+      el.classList.remove("hidden");
+    }
+  };
+  document.getElementById("admin-pass").addEventListener("keydown", e => {
+    if (e.key === "Enter") document.getElementById("admin-login-btn").click();
+  });
+
+  function unlockAdmin() {
+    document.getElementById("admin-lock").classList.add("hidden");
+    document.getElementById("admin-dashboard").classList.remove("hidden");
+    loadData();
+  }
+
+  async function loadData() {
+    document.getElementById("admin-loading").style.display = "block";
+    document.getElementById("admin-table").style.display   = "none";
+    document.getElementById("admin-tbody").innerHTML = "";
+
+    try {
+      const { count: regCount } = await supabase
+        .from("students")
+        .select("id", { count: "exact", head: true });
+
+      const board = await Results.getLeaderboard();
+      allData = board;
+
+      document.getElementById("stat-registered").textContent = regCount ?? "—";
+      document.getElementById("stat-attempted").textContent  = board.length;
+
+      if (board.length > 0) {
+        document.getElementById("stat-highest").textContent = board[0].score;
+        const avg = (board.reduce((s,r) => s + r.score, 0) / board.length).toFixed(1);
+        document.getElementById("stat-avg").textContent = avg;
+      }
+
+      renderTable(allData);
+      document.getElementById("admin-loading").style.display = "none";
+      document.getElementById("admin-table").style.display   = "table";
+
+    } catch(e) {
+      document.getElementById("admin-loading").innerHTML =
+        '<div class="alert alert-error">❌ Failed to load data. Check your connection.</div>';
+      console.error(e);
+    }
+  }
+
+  function renderTable(data) {
+    const tbody = document.getElementById("admin-tbody");
+    tbody.innerHTML = "";
+    data.forEach(row => {
+      const pct  = Math.round((row.score / row.total) * 100);
+      const date = new Date(row.submitted_at).toLocaleString("en-PK");
+      const tr   = document.createElement("tr");
+      if (row.rank <= 3) tr.classList.add(`rank-${row.rank}`);
+      tr.innerHTML = `
+        <td class="rank-cell">${medals[row.rank] || ""} ${row.rank}</td>
+        <td style="font-weight:500;">${row.student_name}</td>
+        <td style="color:var(--text-muted);font-size:0.88rem;">${row.phone}</td>
+        <td><strong>${row.score}</strong></td>
+        <td style="color:var(--text-muted);">${row.total}</td>
+        <td>
+          <span class="badge ${pct >= 70 ? 'badge-success' : pct >= 50 ? 'badge-primary' : 'badge-danger'}">
+            ${pct}%
+          </span>
+        </td>
+        <td style="color:var(--text-muted);font-size:0.83rem;">${date}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.querySelectorAll(".sort-btn").forEach(btn => {
+    btn.onclick = () => {
+      const col    = btn.dataset.col;
+      sortDir[col] = !sortDir[col];
+      const sorted = [...allData].sort((a,b) => {
+        const av = col === "pct" ? a.score/a.total : a[col];
+        const bv = col === "pct" ? b.score/b.total : b[col];
+        return sortDir[col] ? av - bv : bv - av;
+      });
+      renderTable(sorted);
+    };
+  });
+
+  document.getElementById("export-csv").onclick = () => {
+    const rows = [["Rank","Name","Phone","Score","Total","Percentage","Submitted"]];
+    allData.forEach(r => {
+      rows.push([
+        r.rank, r.student_name, r.phone, r.score, r.total,
+        Math.round((r.score/r.total)*100)+"%",
+        new Date(r.submitted_at).toLocaleString("en-PK")
+      ]);
+    });
+    const csv  = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type:"text/csv" });
+    const a    = document.createElement("a");
+    a.href     = URL.createObjectURL(blob);
+    a.download = "sff_results.csv";
+    a.click();
+  };
+
+  document.getElementById("refresh-btn").onclick = loadData;
+</script>
+</body>
+</html>
