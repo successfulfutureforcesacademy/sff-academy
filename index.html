@@ -6,57 +6,36 @@
   <title>Login — Successful Future Forces Academy</title>
   <link rel="stylesheet" href="css/design.css" />
   <style>
-    .login-page { min-height:100vh; display:grid; grid-template-columns:1fr 1fr; }
-    .login-panel-left {
-      background: var(--primary);
-      display:flex; flex-direction:column; justify-content:center; align-items:center;
-      padding:3rem 2.5rem; position:relative; overflow:hidden;
-    }
-    .login-panel-left::before {
-      content:''; position:absolute; top:-80px; right:-80px;
-      width:300px; height:300px; border-radius:50%; background:rgba(255,255,255,0.04);
-    }
-    .login-panel-left::after {
-      content:''; position:absolute; bottom:-60px; left:-60px;
-      width:220px; height:220px; border-radius:50%; background:rgba(200,153,42,0.08);
-    }
-    .crest-emblem {
-      width:100px; height:100px; border-radius:50%;
-      background:rgba(255,255,255,0.08); border:2px solid var(--gold);
-      display:flex; align-items:center; justify-content:center;
-      margin-bottom:1.5rem; font-size:2.8rem; position:relative; z-index:1;
-    }
-    .left-title { font-family:var(--font-display); font-size:1.9rem; color:#fff; text-align:center; line-height:1.3; margin-bottom:0.75rem; position:relative; z-index:1; }
-    .left-sub   { color:var(--gold-light); font-size:0.82rem; letter-spacing:0.14em; text-transform:uppercase; text-align:center; position:relative; z-index:1; }
-    .left-divider { width:60px; height:2px; background:var(--gold); margin:1.5rem auto; border-radius:2px; position:relative; z-index:1; }
-    .left-tagline { color:rgba(255,255,255,0.55); font-size:0.88rem; text-align:center; line-height:1.7; max-width:260px; position:relative; z-index:1; }
-    .left-dots { display:flex; gap:8px; margin-top:2rem; position:relative; z-index:1; }
-    .left-dots span { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.2); }
-    .left-dots span.active { background:var(--gold); }
-    .login-panel-right { display:flex; flex-direction:column; justify-content:center; padding:3rem 3.5rem; max-width:500px; margin:0 auto; width:100%; }
-    .login-heading { font-size:1.7rem; font-weight:700; color:var(--text-main); margin-bottom:0.4rem; }
-    .login-sub-heading { color:var(--text-muted); font-size:0.92rem; margin-bottom:2rem; line-height:1.6; }
-    .login-form { display:flex; flex-direction:column; gap:1.25rem; }
-    .input-icon-wrap { position:relative; }
-    .input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:1.1rem; pointer-events:none; }
-    .input-icon + .form-input { padding-left:2.5rem; }
-    .login-footer { margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border); text-align:center; font-size:0.82rem; color:var(--text-light); }
-    .info-strip { background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.75rem 1rem; font-size:0.83rem; color:var(--text-muted); display:flex; gap:0.5rem; align-items:flex-start; margin-bottom:1.5rem; }
-    .db-status { padding:0.5rem 0.85rem; border-radius:20px; font-size:0.78rem; font-weight:600; display:inline-flex; align-items:center; gap:0.4rem; margin-bottom:1.25rem; }
-    .db-status.checking { background:#f0f0f0; color:#666; }
-    .db-status.ok       { background:#d4edda; color:#155724; }
-    .db-status.fail     { background:#f8d7da; color:#721c24; }
-    @media(max-width:768px){
-      .login-page { grid-template-columns:1fr; }
-      .login-panel-left { padding:2.5rem 1.5rem; min-height:260px; }
-      .left-title { font-size:1.4rem; }
-      .login-panel-right { padding:2rem 1.5rem; max-width:100%; }
-    }
+    .login-page{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+    .login-panel-left{background:var(--primary);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:3rem 2.5rem;position:relative;overflow:hidden}
+    .login-panel-left::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.04)}
+    .login-panel-left::after{content:'';position:absolute;bottom:-60px;left:-60px;width:220px;height:220px;border-radius:50%;background:rgba(200,153,42,0.08)}
+    .crest-emblem{width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.08);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;font-size:2.8rem;position:relative;z-index:1}
+    .left-title{font-family:var(--font-display);font-size:1.9rem;color:#fff;text-align:center;line-height:1.3;margin-bottom:0.75rem;position:relative;z-index:1}
+    .left-sub{color:var(--gold-light);font-size:0.82rem;letter-spacing:0.14em;text-transform:uppercase;text-align:center;position:relative;z-index:1}
+    .left-divider{width:60px;height:2px;background:var(--gold);margin:1.5rem auto;border-radius:2px;position:relative;z-index:1}
+    .left-tagline{color:rgba(255,255,255,0.55);font-size:0.88rem;text-align:center;line-height:1.7;max-width:260px;position:relative;z-index:1}
+    .left-dots{display:flex;gap:8px;margin-top:2rem;position:relative;z-index:1}
+    .left-dots span{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2)}
+    .left-dots span.active{background:var(--gold)}
+    .login-panel-right{display:flex;flex-direction:column;justify-content:center;padding:3rem 3.5rem;max-width:500px;margin:0 auto;width:100%}
+    .login-heading{font-size:1.7rem;font-weight:700;color:var(--text-main);margin-bottom:0.4rem}
+    .login-sub-heading{color:var(--text-muted);font-size:0.92rem;margin-bottom:2rem;line-height:1.6}
+    .login-form{display:flex;flex-direction:column;gap:1.25rem}
+    .input-icon-wrap{position:relative}
+    .input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;pointer-events:none}
+    .input-icon+.form-input{padding-left:2.5rem}
+    .login-footer{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);text-align:center;font-size:0.82rem;color:var(--text-light)}
+    .info-strip{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem 1rem;font-size:0.83rem;color:var(--text-muted);display:flex;gap:0.5rem;align-items:flex-start;margin-bottom:1.5rem}
+    .db-status{padding:0.5rem 0.85rem;border-radius:20px;font-size:0.78rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;margin-bottom:1.25rem}
+    .db-ok{background:#d4edda;color:#155724}
+    .db-fail{background:#f8d7da;color:#721c24}
+    .db-check{background:#f0f0f0;color:#666}
+    @media(max-width:768px){.login-page{grid-template-columns:1fr}.login-panel-left{padding:2.5rem 1.5rem;min-height:260px}.left-title{font-size:1.4rem}.login-panel-right{padding:2rem 1.5rem;max-width:100%}}
   </style>
 </head>
 <body class="page-bg">
 <div class="login-page">
-
   <div class="login-panel-left">
     <div class="crest-emblem">🎓</div>
     <p class="left-sub">Welcome to</p>
@@ -69,15 +48,9 @@
   <div class="login-panel-right">
     <h2 class="login-heading">Student Login</h2>
     <p class="login-sub-heading">Enter your registered name and phone number to access your test.</p>
-
-    <div id="db-status" class="db-status checking">⏳ Checking database…</div>
-
-    <div class="info-strip">
-      ℹ️ <span>Make sure you type your name and phone number <strong>exactly</strong> as registered.</span>
-    </div>
-
-    <div id="alert-box" class="hidden" style="margin-bottom:1rem;"></div>
-
+    <div id="db-status" class="db-status db-check">⏳ Checking database…</div>
+    <div class="info-strip">ℹ️ <span>Type your name and phone number <strong>exactly</strong> as registered.</span></div>
+    <div id="alert-box" style="display:none;margin-bottom:1rem;padding:0.85rem 1rem;border-radius:8px;font-size:0.9rem;"></div>
     <form class="login-form" id="login-form" autocomplete="off">
       <div class="form-group">
         <label class="form-label" for="student-name">Full Name</label>
@@ -98,7 +71,6 @@
         Verify & Start Test →
       </button>
     </form>
-
     <div class="login-footer">
       Not registered? Contact your academy coordinator.<br/>
       <span style="color:var(--primary);font-weight:600;">Successful Future Forces Academy</span>
@@ -106,76 +78,85 @@
   </div>
 </div>
 
-<!-- ① Load Supabase CDN FIRST -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- ② Load config (only has constants, no client creation) -->
-<script src="js/config.js"></script>
-
-<!-- ③ NOW create the supabase client, after CDN is ready -->
 <script>
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
+// ─── CONFIG ────────────────────────────────────────────────
+const SUPABASE_URL     = "https://omabmywlqxgelafokdna.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWJteXdscXhnZWxhZm9rZG5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3NjM0MDYsImV4cCI6MjA5NzMzOTQwNn0.9JlCl6F88q5hxQjNde5UtGQnL8-ypACqAxcxgg7f1dg";
 
-<!-- ④ Load auth (uses supabase client) -->
-<script src="js/auth.js"></script>
+// ─── CREATE CLIENT ─────────────────────────────────────────
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-<!-- ⑤ Page logic -->
-<script>
-  if (Auth.getSession()) window.location.href = "pages/test.html";
+// ─── SESSION ───────────────────────────────────────────────
+function saveSession(student) { sessionStorage.setItem("sff_student", JSON.stringify(student)); }
+function getSession()         { const r = sessionStorage.getItem("sff_student"); return r ? JSON.parse(r) : null; }
 
-  const dbStatus = document.getElementById("db-status");
+if (getSession()) window.location.href = "pages/test.html";
 
-  async function checkDB() {
-    try {
-      const { data, error } = await supabase.from("students").select("id").limit(1);
-      if (error) {
-        dbStatus.className = "db-status fail";
-        dbStatus.textContent = "❌ DB Error: " + error.message;
-      } else {
-        dbStatus.className = "db-status ok";
-        dbStatus.textContent = "✅ Database connected — ready!";
-      }
-    } catch(e) {
-      dbStatus.className = "db-status fail";
-      dbStatus.textContent = "❌ " + e.message;
+// ─── DB CHECK ──────────────────────────────────────────────
+const statusEl = document.getElementById("db-status");
+(async () => {
+  try {
+    const { error } = await db.from("students").select("id").limit(1);
+    if (error) {
+      statusEl.className = "db-status db-fail";
+      statusEl.textContent = "❌ DB Error: " + error.message;
+    } else {
+      statusEl.className = "db-status db-ok";
+      statusEl.textContent = "✅ Database connected — ready!";
     }
+  } catch(e) {
+    statusEl.className = "db-status db-fail";
+    statusEl.textContent = "❌ " + e.message;
   }
-  checkDB();
+})();
 
-  const form    = document.getElementById("login-form");
-  const btn     = document.getElementById("login-btn");
-  const alertEl = document.getElementById("alert-box");
+// ─── LOGIN ─────────────────────────────────────────────────
+const form    = document.getElementById("login-form");
+const btn     = document.getElementById("login-btn");
+const alertEl = document.getElementById("alert-box");
 
-  function showAlert(type, msg) {
-    alertEl.className = `alert alert-${type}`;
-    alertEl.textContent = msg;
-    alertEl.classList.remove("hidden");
-  }
+function showAlert(color, msg) {
+  alertEl.style.display = "block";
+  alertEl.style.background = color === "red" ? "#f8d7da" : "#d4edda";
+  alertEl.style.color      = color === "red" ? "#721c24" : "#155724";
+  alertEl.style.border     = "1px solid " + (color === "red" ? "#f5c6cb" : "#c3e6cb");
+  alertEl.textContent = msg;
+}
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name  = document.getElementById("student-name").value;
-    const phone = document.getElementById("student-phone").value;
-    btn.disabled = true;
-    btn.textContent = "Verifying…";
-    alertEl.classList.add("hidden");
-    try {
-      const result = await Auth.verifyStudent(name, phone);
-      if (!result.success) {
-        showAlert("error", "⚠ You are not registered. Contact your academy coordinator.");
-        btn.disabled = false;
-        btn.textContent = "Verify & Start Test →";
-        return;
-      }
-      Auth.saveSession(result.student);
-      window.location.href = "pages/test.html";
-    } catch(err) {
-      showAlert("error", "Error: " + err.message);
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name  = document.getElementById("student-name").value.trim();
+  const phone = document.getElementById("student-phone").value.trim();
+  btn.disabled = true;
+  btn.textContent = "Verifying…";
+  alertEl.style.display = "none";
+
+  try {
+    const { data, error } = await db
+      .from("students")
+      .select("*")
+      .ilike("name", name)
+      .eq("phone", phone)
+      .single();
+
+    if (error || !data) {
+      showAlert("red", "⚠ You are not registered. Contact your academy coordinator.");
       btn.disabled = false;
       btn.textContent = "Verify & Start Test →";
+      return;
     }
-  });
+    saveSession(data);
+    window.location.href = "pages/test.html";
+  } catch(err) {
+    showAlert("red", "Error: " + err.message);
+    btn.disabled = false;
+    btn.textContent = "Verify & Start Test →";
+  }
+});
 </script>
 </body>
 </html>
