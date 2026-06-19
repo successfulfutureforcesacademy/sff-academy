@@ -100,13 +100,13 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="../js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
-<script src="../js/results.js"></script>
-<script>
+  // ─── Config ───────────────────────────────────────────────
+  var SUPABASE_URL = "https://omabmywlqxgelafokdna.supabase.co";
+  var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWJteXdscXhnZWxhZm9rZG5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3NjM0MDYsImV4cCI6MjA5NzMzOTQwNn0.9JlCl6F88q5hxQjNde5UtGQnL8-ypACqAxcxgg7f1dg";
+  var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   // ── CHANGE THIS PASSWORD ──────────────────────────────────
   const ADMIN_PASSWORD = "sff2025admin";
 
@@ -143,11 +143,20 @@
     document.getElementById("admin-tbody").innerHTML = "";
 
     try {
-      const { count: regCount } = await supabase
+      const { count: regCount } = await db
         .from("students")
         .select("id", { count: "exact", head: true });
 
-      const board = await Results.getLeaderboard();
+      const lbRes = await db.from("results")
+        .select("student_name,score,total,submitted_at,phone,student_id")
+        .order("score", { ascending: false })
+        .order("submitted_at", { ascending: true });
+      if (lbRes.error) throw new Error(lbRes.error.message);
+      let rank = 1;
+      const board = lbRes.data.map(function(row, i) {
+        if (i > 0 && row.score < lbRes.data[i-1].score) rank = i + 1;
+        return Object.assign({}, row, { rank: rank });
+      });
       allData = board;
 
       document.getElementById("stat-registered").textContent = regCount ?? "—";
