@@ -1,0 +1,420 @@
+/* ============================================================
+   FILE: css/design.css
+   PURPOSE: All visual design — colors, fonts, animations
+   CHANGE HERE for any look-and-feel updates
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+/* ── Design Tokens ────────────────────────────────────────── */
+:root {
+  --primary:        #1a2e6b;
+  --primary-light:  #2541a0;
+  --primary-glow:   rgba(26, 46, 107, 0.15);
+  --gold:           #c8992a;
+  --gold-light:     #f0c040;
+  --danger:         #c0392b;
+  --success:        #1a7a4a;
+  --bg:             #f4f6fb;
+  --surface:        #ffffff;
+  --surface-2:      #eef1f8;
+  --border:         #dde3f0;
+  --text-main:      #1a2237;
+  --text-muted:     #6b7a9a;
+  --text-light:     #a0abc0;
+  --radius-sm:      8px;
+  --radius-md:      14px;
+  --radius-lg:      20px;
+  --shadow-sm:      0 2px 8px rgba(26,46,107,0.07);
+  --shadow-md:      0 6px 24px rgba(26,46,107,0.12);
+  --shadow-lg:      0 16px 48px rgba(26,46,107,0.16);
+  --font-display:   'Playfair Display', serif;
+  --font-body:      'Inter', sans-serif;
+}
+
+/* ── Reset ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-main);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Typography ───────────────────────────────────────────── */
+.display-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.academy-crest {
+  font-family: var(--font-display);
+  color: var(--gold);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Cards ────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  padding: 2rem;
+}
+
+.card-sm {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem 1.5rem;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(26,46,107,0.3);
+}
+.btn-primary:hover { background: var(--primary-light); box-shadow: 0 6px 20px rgba(26,46,107,0.4); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--border);
+}
+.btn-outline:hover { background: var(--surface-2); border-color: var(--primary); }
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(200,153,42,0.35);
+}
+.btn-gold:hover { filter: brightness(1.05); box-shadow: 0 6px 20px rgba(200,153,42,0.45); }
+
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+/* ── Form Fields ──────────────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.form-input {
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text-main);
+  background: var(--surface);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.form-input:focus {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.form-input::placeholder { color: var(--text-light); }
+
+/* ── Divider ──────────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1.5rem 0;
+}
+
+/* ── Badge ────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.badge-primary  { background: var(--primary-glow); color: var(--primary); }
+.badge-gold     { background: rgba(200,153,42,0.15); color: var(--gold); }
+.badge-success  { background: rgba(26,122,74,0.12); color: var(--success); }
+.badge-danger   { background: rgba(192,57,43,0.12); color: var(--danger); }
+
+/* ── Alert ────────────────────────────────────────────────── */
+.alert {
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.alert-error   { background: rgba(192,57,43,0.1); color: var(--danger);  border: 1px solid rgba(192,57,43,0.2); }
+.alert-success { background: rgba(26,122,74,0.1); color: var(--success); border: 1px solid rgba(26,122,74,0.2); }
+.alert-warning { background: rgba(200,153,42,0.1); color: #8a6a00;       border: 1px solid rgba(200,153,42,0.25); }
+
+/* ── Page Header Brand Strip ──────────────────────────────── */
+.brand-strip {
+  background: var(--primary);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand-strip .brand-name {
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.brand-strip .brand-sub {
+  color: var(--gold-light);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── Timer ────────────────────────────────────────────────── */
+.timer-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-display .time-seg {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 2ch;
+  text-align: center;
+}
+
+.timer-display .time-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  display: block;
+  text-align: center;
+}
+
+.timer-display.urgent .time-seg { color: var(--danger); animation: pulse 1s infinite; }
+.timer-display .colon { font-size: 1.4rem; font-weight: 700; color: var(--text-light); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Progress Bar ─────────────────────────────────────────── */
+.progress-bar-wrap {
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  border-radius: 100px;
+  transition: width 0.4s ease;
+}
+
+/* ── MCQ Option Buttons ───────────────────────────────────── */
+.option-btn {
+  width: 100%;
+  text-align: left;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-family: var(--font-body);
+  font-size: 0.97rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.option-btn:hover { border-color: var(--primary-light); background: var(--surface-2); transform: translateX(3px); }
+.option-btn.selected {
+  border-color: var(--primary);
+  background: var(--primary-glow);
+  color: var(--primary);
+  font-weight: 600;
+}
+.option-btn .option-letter {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+}
+.option-btn.selected .option-letter {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ── Question navigation dots ─────────────────────────────── */
+.q-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.q-dot {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.q-dot:hover     { border-color: var(--primary); color: var(--primary); }
+.q-dot.answered  { background: var(--primary); color: #fff; border-color: var(--primary); }
+.q-dot.current   { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 0 2px rgba(200,153,42,0.3); }
+
+/* ── Leaderboard Table ────────────────────────────────────── */
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.lb-table th {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 2px solid var(--border);
+}
+.lb-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+.lb-table tr:last-child td { border-bottom: none; }
+.lb-table tr.highlight-me td { background: rgba(200,153,42,0.07); font-weight: 600; }
+.lb-table .rank-cell { font-weight: 700; color: var(--primary); font-size: 1rem; }
+.lb-table .rank-1 .rank-cell { color: var(--gold); font-size: 1.15rem; }
+.lb-table .rank-2 .rank-cell { color: var(--text-muted); }
+.lb-table .rank-3 .rank-cell { color: #c47b3e; }
+
+/* ── Warning Toast ────────────────────────────────────────── */
+.cheat-warning {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-120%);
+  background: var(--danger);
+  color: #fff;
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  z-index: 9999;
+  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+}
+.cheat-warning.visible { transform: translateX(-50%) translateY(0); }
+
+/* ── Decorative Background Pattern ───────────────────────── */
+.page-bg {
+  min-height: 100vh;
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(26,46,107,0.05) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(200,153,42,0.06) 0%, transparent 50%);
+}
+
+/* ── Score Ring ───────────────────────────────────────────── */
+.score-ring-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+.score-ring-wrap svg { overflow: visible; }
+
+/* ── Spinner ──────────────────────────────────────────────── */
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Utility ──────────────────────────────────────────────── */
+.text-center { text-align: center; }
+.text-muted  { color: var(--text-muted); }
+.mt-1  { margin-top: 0.5rem; }
+.mt-2  { margin-top: 1rem; }
+.mt-3  { margin-top: 1.5rem; }
+.mt-4  { margin-top: 2rem; }
+.gap-1 { gap: 0.5rem; }
+.gap-2 { gap: 1rem; }
+.flex  { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.w-full { width: 100%; }
+.hidden { display: none !important; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .card { padding: 1.25rem; }
+  .brand-strip { padding: 0.75rem 1rem; }
+}
