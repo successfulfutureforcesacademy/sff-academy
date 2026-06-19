@@ -32,19 +32,19 @@
     <div class="brand-sub">Online Assessment Portal</div>
   </div>
   <div id="header-timer" class="timer-display">
-    <div><span class="time-seg" id="t-h">00</span><span class="time-label">hr</span></div>
+    <div><span class="time-seg" id="t-h">--</span><span class="time-label">hr</span></div>
     <span class="colon">:</span>
-    <div><span class="time-seg" id="t-m">00</span><span class="time-label">min</span></div>
+    <div><span class="time-seg" id="t-m">--</span><span class="time-label">min</span></div>
     <span class="colon">:</span>
-    <div><span class="time-seg" id="t-s">00</span><span class="time-label">sec</span></div>
+    <div><span class="time-seg" id="t-s">--</span><span class="time-label">sec</span></div>
   </div>
 </div>
 
-<div class="cheat-warning" id="cheat-warning">⚠ Warning: This action is not allowed during the test!</div>
+<div class="cheat-warning" id="cheat-warning">⚠ Warning: This action is not allowed!</div>
 
 <div id="loading-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5rem 1rem;gap:1rem;">
   <div class="spinner"></div>
-  <p class="text-muted" style="font-size:0.95rem;">Loading your test, please wait…</p>
+  <p id="loading-msg" style="font-size:0.95rem;color:#666;">Loading your test, please wait…</p>
 </div>
 
 <div class="test-layout hidden" id="test-layout">
@@ -109,7 +109,7 @@
   <div class="time-up-card">
     <div class="time-up-icon">⏰</div>
     <h2 style="font-family:var(--font-display);color:var(--primary);margin-bottom:0.6rem;">Time Is Up!</h2>
-    <p style="color:var(--text-muted);margin-bottom:1.75rem;line-height:1.6;">Your answers have been submitted automatically.</p>
+    <p style="color:var(--text-muted);margin-bottom:1.75rem;line-height:1.6;">Your answers have been submitted. Calculating result…</p>
     <div class="spinner" style="margin:0 auto;"></div>
   </div>
 </div>
@@ -125,71 +125,141 @@
   </div>
 </div>
 
-<!-- Supabase CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- ======================================================
+     NO EXTERNAL JS FILES — everything is here
+     ====================================================== -->
+
+<!-- Supabase: two CDN sources as backup -->
+<script>
+// We will load Supabase manually with a fallback
+(function() {
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  s.onload = function() { window._supaLoaded = true; startApp(); };
+  s.onerror = function() {
+    // First CDN failed, try backup
+    var s2 = document.createElement('script');
+    s2.src = 'https://unpkg.com/@supabase/supabase-js@2';
+    s2.onload = function() { window._supaLoaded = true; startApp(); };
+    s2.onerror = function() {
+      document.getElementById('loading-msg').textContent =
+        '❌ Cannot load Supabase library. Check your internet connection and refresh.';
+      document.getElementById('loading-msg').style.color = 'red';
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s);
+})();
+</script>
 
 <script>
-// ─── CONFIG ────────────────────────────────────────────────
-const SUPABASE_URL      = "https://omabmywlqxgelafokdna.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWJteXdscXhnZWxhZm9rZG5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3NjM0MDYsImV4cCI6MjA5NzMzOTQwNn0.9JlCl6F88q5hxQjNde5UtGQnL8-ypACqAxcxgg7f1dg";
-const TEST_END_TIME     = { hour: 17, minute: 30 }; // ← CHANGE THIS for your test time
+// ════════════════════════════════════════════════════════
+// ▶  CHANGE TEST END TIME HERE
+//    hour   = 24-hour format  (e.g. 14 = 2 PM, 17 = 5 PM)
+//    minute = minutes         (e.g. 30 = :30)
+// ════════════════════════════════════════════════════════
+var TEST_HOUR   = 23;   // ← CHANGE THIS
+var TEST_MINUTE = 59;   // ← CHANGE THIS
 
-// ─── SUPABASE CLIENT ──────────────────────────────────────
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ════════════════════════════════════════════════════════
+// Supabase credentials — do not change
+// ════════════════════════════════════════════════════════
+var SUPABASE_URL = "https://omabmywlqxgelafokdna.supabase.co";
+var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWJteXdscXhnZWxhZm9rZG5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3NjM0MDYsImV4cCI6MjA5NzMzOTQwNn0.9JlCl6F88q5hxQjNde5UtGQnL8-ypACqAxcxgg7f1dg";
 
-// ─── SESSION CHECK ─────────────────────────────────────────
-const sessionRaw = sessionStorage.getItem("sff_student");
-if (!sessionRaw) { window.location.href = "../index.html"; }
-const student = JSON.parse(sessionRaw);
+// ─── State ────────────────────────────────────────────
+var db, questions = [], currentIndex = 0, timerHandle = null;
+var answers = {};
+try { answers = JSON.parse(sessionStorage.getItem("sff_answers") || "{}"); } catch(e) {}
 
-document.getElementById("student-name-display").textContent  = student.name;
-document.getElementById("student-phone-display").textContent = student.phone;
+// ─── Session check ─────────────────────────────────────
+var studentRaw = sessionStorage.getItem("sff_student");
+if (!studentRaw) { window.location.href = "../index.html"; }
+var student = {};
+try { student = JSON.parse(studentRaw); } catch(e) { window.location.href = "../index.html"; }
 
-// ─── STATE ─────────────────────────────────────────────────
-let questions    = [];
-let currentIndex = 0;
-let answers      = JSON.parse(sessionStorage.getItem("sff_answers") || "{}");
-let timerHandle  = null;
+document.getElementById("student-name-display").textContent  = student.name  || "—";
+document.getElementById("student-phone-display").textContent = student.phone || "—";
 
-// ─── LOAD QUESTIONS ────────────────────────────────────────
-async function loadQuestions() {
-  const { data, error } = await db
-    .from("questions")
-    .select("*")
-    .order("id", { ascending: true });
-  if (error) throw error;
-  questions = data;
+// ─── Main app starts after Supabase CDN loads ──────────
+function startApp() {
+  try {
+    // supabase global is set by the CDN
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } catch(e) {
+    showError("❌ Could not connect to database: " + e.message);
+    return;
+  }
+
+  if (sessionStorage.getItem("sff_submitted") === "true") {
+    window.location.href = "result.html";
+    return;
+  }
+
+  // Load questions
+  db.from("questions").select("*").order("id", { ascending: true })
+    .then(function(res) {
+      if (res.error) {
+        showError("❌ Database error: " + res.error.message +
+          "<br><br>Make sure RLS is disabled on your questions table in Supabase.");
+        return;
+      }
+      if (!res.data || res.data.length === 0) {
+        showError("⚠ No questions found! Please add questions in your Supabase questions table first.");
+        return;
+      }
+      questions = res.data;
+
+      // Show test
+      document.getElementById("loading-state").classList.add("hidden");
+      document.getElementById("test-layout").classList.remove("hidden");
+      renderQuestion();
+      startTimer();
+      enableAntiCheat();
+    })
+    .catch(function(e) {
+      showError("❌ Failed to load questions: " + e.message);
+    });
 }
 
-// ─── RENDER ────────────────────────────────────────────────
-function pad2(n) { return String(n).padStart(2, "0"); }
+function showError(msg) {
+  document.getElementById("loading-state").style.display = "flex";
+  document.getElementById("loading-msg").innerHTML = msg;
+  document.getElementById("loading-msg").style.color = "red";
+  document.getElementById("loading-msg").style.textAlign = "center";
+  document.querySelector(".spinner").style.display = "none";
+}
+
+// ─── Render question ────────────────────────────────────
+function pad2(n) { return String(n).padStart(2,"0"); }
 
 function renderQuestion() {
-  const q     = questions[currentIndex];
-  const total = questions.length;
+  var q = questions[currentIndex];
+  var total = questions.length;
 
-  document.getElementById("q-counter").textContent      = `Question ${currentIndex + 1} of ${total}`;
-  document.getElementById("q-num-label").textContent    = `Q${currentIndex + 1}`;
+  document.getElementById("q-counter").textContent      = "Question " + (currentIndex+1) + " of " + total;
+  document.getElementById("q-num-label").textContent    = "Q" + (currentIndex+1);
   document.getElementById("q-text").textContent         = q.question_text;
-  document.getElementById("answered-badge").textContent = `${Object.keys(answers).length} answered`;
-  document.getElementById("progress-fill").style.width  = `${((currentIndex + 1) / total) * 100}%`;
+  document.getElementById("answered-badge").textContent = Object.keys(answers).length + " answered";
+  document.getElementById("progress-fill").style.width  = (((currentIndex+1)/total)*100) + "%";
 
-  const container = document.getElementById("options-container");
+  var container = document.getElementById("options-container");
   container.innerHTML = "";
-  const letters = ["A","B","C","D"];
-  const opts    = [q.option_a, q.option_b, q.option_c, q.option_d];
-  const saved   = answers[q.id];
+  var letters = ["A","B","C","D"];
+  var opts    = [q.option_a, q.option_b, q.option_c, q.option_d];
+  var saved   = answers[q.id];
 
-  opts.forEach((opt, i) => {
-    const btn = document.createElement("button");
+  opts.forEach(function(opt, i) {
+    var btn = document.createElement("button");
     btn.className = "option-btn" + (saved === letters[i] ? " selected" : "");
-    btn.innerHTML = `<span class="option-letter">${letters[i]}</span> ${opt}`;
-    btn.onclick = () => {
-      answers[q.id] = letters[i];
-      sessionStorage.setItem("sff_answers", JSON.stringify(answers));
-      renderQuestion();
-    };
+    btn.innerHTML = '<span class="option-letter">' + letters[i] + '</span> ' + opt;
+    btn.onclick = (function(letter) {
+      return function() {
+        answers[q.id] = letter;
+        sessionStorage.setItem("sff_answers", JSON.stringify(answers));
+        renderQuestion();
+      };
+    })(letters[i]);
     container.appendChild(btn);
   });
 
@@ -199,134 +269,140 @@ function renderQuestion() {
 }
 
 function renderDots() {
-  const dots = document.getElementById("q-dots");
+  var dots = document.getElementById("q-dots");
   dots.innerHTML = "";
-  questions.forEach((q, i) => {
-    const dot = document.createElement("button");
+  questions.forEach(function(q, i) {
+    var dot = document.createElement("button");
     dot.className = "q-dot" + (answers[q.id] ? " answered" : "") + (i === currentIndex ? " current" : "");
     dot.textContent = i + 1;
-    dot.onclick = () => { currentIndex = i; renderQuestion(); };
+    dot.onclick = (function(idx) { return function() { currentIndex = idx; renderQuestion(); }; })(i);
     dots.appendChild(dot);
   });
 }
 
-// ─── TIMER ─────────────────────────────────────────────────
+// ─── Timer ──────────────────────────────────────────────
 function startTimer() {
-  timerHandle = setInterval(() => {
-    const now  = new Date();
-    const end  = new Date();
-    end.setHours(TEST_END_TIME.hour, TEST_END_TIME.minute, 0, 0);
-    const remaining = end - now;
+  timerHandle = setInterval(function() {
+    var now = new Date();
+    var end = new Date();
+    end.setHours(TEST_HOUR, TEST_MINUTE, 0, 0);
 
-    if (remaining <= 0) {
+    // if end time is in the past (already passed today), add 1 day
+    // This prevents 00:00:00 showing when you set a time that already passed
+    if (end <= now) {
+      // Time already passed — show time up
       clearInterval(timerHandle);
       onTimeUp();
       return;
     }
-    const h = Math.floor(remaining / 3600000);
-    const m = Math.floor((remaining % 3600000) / 60000);
-    const s = Math.floor((remaining % 60000) / 1000);
+
+    var remaining = end - now;
+    var h = Math.floor(remaining / 3600000);
+    var m = Math.floor((remaining % 3600000) / 60000);
+    var s = Math.floor((remaining % 60000) / 1000);
+
     document.getElementById("t-h").textContent = pad2(h);
     document.getElementById("t-m").textContent = pad2(m);
     document.getElementById("t-s").textContent = pad2(s);
-    if (remaining < 300000) document.getElementById("header-timer").classList.add("urgent");
+
+    if (remaining < 300000) {
+      document.getElementById("header-timer").classList.add("urgent");
+    }
   }, 1000);
 }
 
-// ─── SUBMIT ────────────────────────────────────────────────
-async function submitTest() {
+// ─── Submit ─────────────────────────────────────────────
+function submitTest(callback) {
   if (sessionStorage.getItem("sff_submitted") === "true") {
     window.location.href = "result.html"; return;
   }
-  let score = 0;
-  questions.forEach(q => { if (answers[q.id] === q.correct_answer) score++; });
+  var score = 0;
+  questions.forEach(function(q) {
+    if (answers[q.id] === q.correct_answer) score++;
+  });
 
-  const { error } = await db.from("results").upsert({
+  db.from("results").upsert({
     student_id:   student.id,
     student_name: student.name,
     phone:        student.phone,
-    score,
+    score:        score,
     total:        questions.length,
     answers:      JSON.stringify(answers),
-    submitted_at: new Date().toISOString(),
-  }, { onConflict: "student_id" });
-
-  if (error) console.error("Submit error:", error.message);
-  sessionStorage.setItem("sff_submitted", "true");
-  setTimeout(() => { window.location.href = "result.html"; }, 2000);
+    submitted_at: new Date().toISOString()
+  }, { onConflict: "student_id" })
+  .then(function(res) {
+    if (res.error) console.error("Submit error:", res.error.message);
+    sessionStorage.setItem("sff_submitted", "true");
+    setTimeout(function() { window.location.href = "result.html"; }, 2500);
+  })
+  .catch(function(e) {
+    console.error(e);
+    sessionStorage.setItem("sff_submitted", "true");
+    setTimeout(function() { window.location.href = "result.html"; }, 2500);
+  });
 }
 
-async function onTimeUp() {
+function onTimeUp() {
+  if (timerHandle) clearInterval(timerHandle);
   document.getElementById("time-up-overlay").classList.remove("hidden");
-  await submitTest();
+  submitTest();
 }
 
-// ─── ANTI-CHEAT ────────────────────────────────────────────
+// ─── Anti-cheat ─────────────────────────────────────────
 function showWarning(msg) {
-  const el = document.getElementById("cheat-warning");
+  var el = document.getElementById("cheat-warning");
   el.textContent = msg;
   el.classList.add("visible");
-  setTimeout(() => el.classList.remove("visible"), 3500);
+  setTimeout(function() { el.classList.remove("visible"); }, 3500);
 }
 
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) showWarning("⚠ Warning: Switching tabs is not allowed!");
-});
-window.addEventListener("blur", () => showWarning("⚠ Warning: Do not leave the test window!"));
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.addEventListener("copy",  e => e.preventDefault());
-document.addEventListener("cut",   e => e.preventDefault());
-document.addEventListener("paste", e => e.preventDefault());
-document.addEventListener("keydown", e => {
-  if ((e.ctrlKey && ["c","v","u","s","a","p"].includes(e.key.toLowerCase())) ||
-      e.key === "F12" ||
-      (e.ctrlKey && e.shiftKey && ["i","j","c"].includes(e.key.toLowerCase()))) {
-    e.preventDefault();
-    showWarning("⚠ Keyboard shortcuts are disabled during the test.");
-  }
-});
-document.documentElement.requestFullscreen?.().catch(() => {});
+function enableAntiCheat() {
+  document.addEventListener("visibilitychange", function() {
+    if (document.hidden) showWarning("⚠ Warning: Switching tabs is not allowed!");
+  });
+  window.addEventListener("blur", function() {
+    showWarning("⚠ Do not leave the test window!");
+  });
+  document.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+  document.addEventListener("copy",  function(e) { e.preventDefault(); });
+  document.addEventListener("cut",   function(e) { e.preventDefault(); });
+  document.addEventListener("paste", function(e) { e.preventDefault(); });
+  document.addEventListener("keydown", function(e) {
+    if ((e.ctrlKey && ["c","v","u","s","a","p"].includes(e.key.toLowerCase())) ||
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey)) {
+      e.preventDefault();
+      showWarning("⚠ Keyboard shortcuts are disabled during the test.");
+    }
+  });
+  try { document.documentElement.requestFullscreen(); } catch(e) {}
+}
 
-// ─── NAV BUTTONS ───────────────────────────────────────────
-document.getElementById("btn-prev").onclick = () => { if (currentIndex > 0) { currentIndex--; renderQuestion(); } };
-document.getElementById("btn-next").onclick = () => { if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); } };
-document.getElementById("btn-skip").onclick = () => { if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); } };
-
-document.getElementById("btn-submit").onclick = () => {
-  const answered = Object.keys(answers).length;
-  const skipped  = questions.length - answered;
+// ─── Navigation buttons ─────────────────────────────────
+document.getElementById("btn-prev").onclick = function() {
+  if (currentIndex > 0) { currentIndex--; renderQuestion(); }
+};
+document.getElementById("btn-next").onclick = function() {
+  if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); }
+};
+document.getElementById("btn-skip").onclick = function() {
+  if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); }
+};
+document.getElementById("btn-submit").onclick = function() {
+  var answered = Object.keys(answers).length;
+  var skipped  = questions.length - answered;
   document.getElementById("submit-confirm-msg").textContent =
-    `You answered ${answered} out of ${questions.length} questions.${skipped > 0 ? " " + skipped + " are skipped." : ""} Submit now?`;
+    "You answered " + answered + " out of " + questions.length + " questions." +
+    (skipped > 0 ? " " + skipped + " are unanswered." : "") + " Submit now?";
   document.getElementById("submit-confirm").classList.remove("hidden");
 };
-document.getElementById("cancel-submit").onclick  = () => document.getElementById("submit-confirm").classList.add("hidden");
-document.getElementById("confirm-submit").onclick = async () => {
+document.getElementById("cancel-submit").onclick = function() {
   document.getElementById("submit-confirm").classList.add("hidden");
-  document.getElementById("time-up-overlay").classList.remove("hidden");
-  await submitTest();
 };
-
-// ─── INIT ──────────────────────────────────────────────────
-(async () => {
-  try {
-    if (sessionStorage.getItem("sff_submitted") === "true") {
-      window.location.href = "result.html"; return;
-    }
-    await loadQuestions();
-    if (questions.length === 0) {
-      document.getElementById("loading-state").innerHTML =
-        '<div style="color:red;font-size:1rem;">⚠ No questions found in database. Please add questions in Supabase first.</div>';
-      return;
-    }
-    document.getElementById("loading-state").classList.add("hidden");
-    document.getElementById("test-layout").classList.remove("hidden");
-    renderQuestion();
-    startTimer();
-  } catch(err) {
-    document.getElementById("loading-state").innerHTML =
-      `<div style="color:red;font-size:1rem;">❌ Failed to load test: ${err.message}</div>`;
-  }
-})();
+document.getElementById("confirm-submit").onclick = function() {
+  document.getElementById("submit-confirm").classList.add("hidden");
+  onTimeUp();
+};
 </script>
 </body>
 </html>
