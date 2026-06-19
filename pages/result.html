@@ -6,55 +6,20 @@
   <title>Your Result — Successful Future Forces Academy</title>
   <link rel="stylesheet" href="../css/design.css" />
   <style>
-    .result-page { max-width: 840px; margin: 0 auto; padding: 2rem 1.5rem; }
-    .result-hero {
-      background: var(--primary);
-      border-radius: var(--radius-lg);
-      padding: 2.75rem 2rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-      position: relative; overflow: hidden;
-    }
-    .result-hero::before {
-      content:''; position:absolute; top:-80px; right:-80px;
-      width:240px; height:240px; border-radius:50%;
-      background:rgba(200,153,42,0.1);
-    }
-    .result-hero::after {
-      content:''; position:absolute; bottom:-60px; left:-60px;
-      width:180px; height:180px; border-radius:50%;
-      background:rgba(255,255,255,0.04);
-    }
-    .hero-name { color:var(--gold-light); font-size:0.82rem; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.3rem; position:relative;z-index:1; }
-    .hero-title { font-family:var(--font-display); color:#fff; font-size:1.7rem; margin-bottom:1.75rem; position:relative;z-index:1; }
-    .rank-badge {
-      display:inline-block;
-      background:rgba(200,153,42,0.2);
-      border:1.5px solid var(--gold);
-      color:var(--gold-light);
-      padding:0.5rem 1.75rem;
-      border-radius:100px;
-      font-size:1.05rem; font-weight:700;
-      margin-top:1rem; position:relative;z-index:1;
-    }
-    .stats-row {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:1rem; margin-bottom:1.5rem;
-    }
-    .stat-card {
-      background:var(--surface); border-radius:var(--radius-md);
-      border:1px solid var(--border); padding:1.25rem; text-align:center;
-    }
-    .stat-label { font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.4rem; }
-    .stat-value { font-size:2.1rem; font-weight:700; color:var(--primary); }
-    .lb-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.75rem; }
-    .medal { font-size:1.2rem; }
-    .score-ring-svg { display:block; margin:0 auto; position:relative;z-index:1; }
-    @media(max-width:500px){
-      .result-hero{padding:2rem 1.25rem;}
-      .stats-row{grid-template-columns:1fr 1fr;}
-    }
+    .result-page{max-width:840px;margin:0 auto;padding:2rem 1.5rem}
+    .result-hero{background:var(--primary);border-radius:var(--radius-lg);padding:2.75rem 2rem;text-align:center;margin-bottom:1.5rem;position:relative;overflow:hidden}
+    .result-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:240px;height:240px;border-radius:50%;background:rgba(200,153,42,0.1)}
+    .result-hero::after{content:'';position:absolute;bottom:-60px;left:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.04)}
+    .hero-name{color:var(--gold-light);font-size:0.82rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.3rem;position:relative;z-index:1}
+    .hero-title{font-family:var(--font-display);color:#fff;font-size:1.7rem;margin-bottom:1.75rem;position:relative;z-index:1}
+    .rank-badge{display:inline-block;background:rgba(200,153,42,0.2);border:1.5px solid var(--gold);color:var(--gold-light);padding:0.5rem 1.75rem;border-radius:100px;font-size:1.05rem;font-weight:700;margin-top:1rem;position:relative;z-index:1}
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem}
+    .stat-card{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border);padding:1.25rem;text-align:center}
+    .stat-label{font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem}
+    .stat-value{font-size:2.1rem;font-weight:700;color:var(--primary)}
+    .lb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem}
+    .score-ring-svg{display:block;margin:0 auto;position:relative;z-index:1}
+    @media(max-width:500px){.result-hero{padding:2rem 1.25rem}.stats-row{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body class="page-bg">
@@ -68,26 +33,18 @@
 
 <div id="loading-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5rem 1rem;gap:1rem;">
   <div class="spinner"></div>
-  <p class="text-muted">Calculating your result…</p>
+  <p id="loading-msg" style="font-size:0.95rem;color:#666;">Loading your result…</p>
 </div>
 
 <div class="result-page hidden" id="result-page">
-
-  <!-- Hero -->
   <div class="result-hero">
     <p class="hero-name" id="res-student-name">—</p>
-    <h2 class="hero-title">Test Completed!</h2>
-
+    <h2 class="hero-title">Test Completed! 🎉</h2>
     <svg class="score-ring-svg" width="170" height="170" viewBox="0 0 170 170">
       <circle cx="85" cy="85" r="72" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="13"/>
-      <circle cx="85" cy="85" r="72" fill="none"
-        stroke="url(#ringGrad)" stroke-width="13"
-        stroke-linecap="round"
-        stroke-dasharray="452"
-        stroke-dashoffset="452"
-        id="ring-fill"
-        transform="rotate(-90 85 85)"
-      />
+      <circle cx="85" cy="85" r="72" fill="none" stroke="url(#ringGrad)" stroke-width="13"
+        stroke-linecap="round" stroke-dasharray="452" stroke-dashoffset="452"
+        id="ring-fill" transform="rotate(-90 85 85)"/>
       <defs>
         <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stop-color="#c8992a"/>
@@ -97,11 +54,9 @@
       <text x="85" y="79" text-anchor="middle" fill="#fff" font-size="30" font-weight="700" font-family="Inter,sans-serif" id="ring-score">0</text>
       <text x="85" y="100" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="13" font-family="Inter,sans-serif" id="ring-total">out of 0</text>
     </svg>
-
     <div class="rank-badge" id="rank-badge">Calculating rank…</div>
   </div>
 
-  <!-- Stats -->
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-label">✅ Correct</div>
@@ -121,21 +76,15 @@
     </div>
   </div>
 
-  <!-- Leaderboard -->
   <div class="card">
     <div class="lb-header">
-      <h3 style="font-family:var(--font-display);color:var(--primary);font-size:1.3rem;">All Students Ranking</h3>
+      <h3 style="font-family:var(--font-display);color:var(--primary);font-size:1.3rem;">🏆 All Students Ranking</h3>
       <span class="badge badge-primary" id="total-students-badge">loading…</span>
     </div>
     <div style="overflow-x:auto;">
       <table class="lb-table">
         <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Student Name</th>
-            <th>Score</th>
-            <th>Percentage</th>
-          </tr>
+          <tr><th>Rank</th><th>Student Name</th><th>Score</th><th>Percentage</th></tr>
         </thead>
         <tbody id="leaderboard-body"></tbody>
       </table>
@@ -146,92 +95,128 @@
     <p style="font-size:0.85rem;color:var(--text-muted);">Thank you for completing the test. Contact your instructor for further details.</p>
     <p style="font-size:0.85rem;color:var(--primary);font-weight:600;margin-top:0.4rem;">Successful Future Forces Academy</p>
   </div>
-
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="../js/config.js"></script>
-<script>
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
-<script src="../js/auth.js"></script>
-<script src="../js/results.js"></script>
-<script>
-  Auth.requireAuth();
-  const student = Auth.getSession();
-  const medals  = { 1:"🥇", 2:"🥈", 3:"🥉" };
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  function animateRing(score, total) {
-    const circumference = 452;
-    const targetOffset  = circumference - (score / total) * circumference;
-    const ring = document.getElementById("ring-fill");
-    let start  = null;
-    function step(ts) {
-      if (!start) start = ts;
-      const progress = Math.min((ts - start) / 1400, 1);
-      const ease     = 1 - Math.pow(1 - progress, 3);
-      ring.setAttribute("stroke-dashoffset", circumference - ease * (circumference - targetOffset));
-      if (progress < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
+<script>
+// ─── CONFIG ─────────────────────────────────────────────
+var SUPABASE_URL = "https://omabmywlqxgelafokdna.supabase.co";
+var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWJteXdscXhnZWxhZm9rZG5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3NjM0MDYsImV4cCI6MjA5NzMzOTQwNn0.9JlCl6F88q5hxQjNde5UtGQnL8-ypACqAxcxgg7f1dg";
+
+// ─── SESSION CHECK ───────────────────────────────────────
+var studentRaw = sessionStorage.getItem("sff_student");
+if (!studentRaw) { window.location.href = "../index.html"; }
+var student;
+try { student = JSON.parse(studentRaw); } catch(e) { window.location.href = "../index.html"; }
+
+// ─── SUPABASE CLIENT ─────────────────────────────────────
+var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ─── HELPERS ─────────────────────────────────────────────
+function showError(msg) {
+  document.querySelector(".spinner").style.display = "none";
+  document.getElementById("loading-msg").innerHTML = msg;
+  document.getElementById("loading-msg").style.color = "red";
+}
+
+function animateRing(score, total) {
+  var circumference = 452;
+  var targetOffset  = circumference - (score / total) * circumference;
+  var ring = document.getElementById("ring-fill");
+  var start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    var progress = Math.min((ts - start) / 1400, 1);
+    var ease = 1 - Math.pow(1 - progress, 3);
+    ring.setAttribute("stroke-dashoffset", circumference - ease * (circumference - targetOffset));
+    if (progress < 1) requestAnimationFrame(step);
   }
+  requestAnimationFrame(step);
+}
 
-  (async () => {
-    try {
-      const myResult = await Results.getMyResult(student.id);
-      const board    = await Results.getLeaderboard();
+// ─── LOAD RESULTS ────────────────────────────────────────
+(function() {
+  // Fetch my result and leaderboard at the same time (faster!)
+  var myResultPromise = db.from("results").select("*").eq("student_id", student.id).single();
+  var leaderboardPromise = db.from("results")
+    .select("student_name,score,total,submitted_at,student_id")
+    .order("score", { ascending: false })
+    .order("submitted_at", { ascending: true });
 
-      document.getElementById("loading-state").classList.add("hidden");
-      document.getElementById("result-page").classList.remove("hidden");
+  Promise.all([myResultPromise, leaderboardPromise])
+    .then(function(responses) {
+      var myRes  = responses[0];
+      var lbRes  = responses[1];
 
-      if (!myResult) {
-        document.getElementById("result-page").innerHTML =
-          '<div class="alert alert-warning" style="margin:2rem auto;max-width:480px;">No result found. You may not have submitted the test yet.</div>';
+      if (myRes.error || !myRes.data) {
+        showError("❌ Your result was not found.<br>Make sure you submitted the test properly.");
+        return;
+      }
+      if (lbRes.error) {
+        showError("❌ Could not load leaderboard: " + lbRes.error.message +
+          "<br>Make sure RLS is disabled on the results table in Supabase.");
         return;
       }
 
-      const { score, total } = myResult;
-      const answersObj = JSON.parse(myResult.answers || "{}");
-      const answered   = Object.keys(answersObj).length;
-      const skipped    = total - answered;
-      const wrong      = answered - score;
-      const pct        = Math.round((score / total) * 100);
-      const myRank     = board.findIndex(r => r.student_id === student.id) + 1;
+      var myResult = myRes.data;
+      var board    = lbRes.data;
+
+      // Assign ranks
+      var ranked = [];
+      var rank = 1;
+      board.forEach(function(row, i) {
+        if (i > 0 && row.score < board[i-1].score) rank = i + 1;
+        ranked.push(Object.assign({}, row, { rank: rank }));
+      });
+
+      // Show page
+      document.getElementById("loading-state").classList.add("hidden");
+      document.getElementById("result-page").classList.remove("hidden");
+
+      var score   = myResult.score;
+      var total   = myResult.total;
+      var answersObj = {};
+      try { answersObj = JSON.parse(myResult.answers || "{}"); } catch(e) {}
+      var answered = Object.keys(answersObj).length;
+      var skipped  = Math.max(0, total - answered);
+      var wrong    = Math.max(0, answered - score);
+      var pct      = total > 0 ? Math.round((score / total) * 100) : 0;
+      var myRank   = ranked.findIndex(function(r) { return r.student_id === student.id; }) + 1;
 
       document.getElementById("res-student-name").textContent = student.name;
       document.getElementById("ring-score").textContent  = score;
-      document.getElementById("ring-total").textContent  = `out of ${total}`;
-      document.getElementById("rank-badge").textContent  = `🏆 Rank #${myRank} out of ${board.length} students`;
+      document.getElementById("ring-total").textContent  = "out of " + total;
+      document.getElementById("rank-badge").textContent  = "🏆 Rank #" + myRank + " out of " + ranked.length + " students";
       animateRing(score, total);
 
       document.getElementById("stat-correct").textContent  = score;
-      document.getElementById("stat-wrong").textContent    = wrong >= 0 ? wrong : 0;
-      document.getElementById("stat-skipped").textContent  = skipped >= 0 ? skipped : 0;
+      document.getElementById("stat-wrong").textContent    = wrong;
+      document.getElementById("stat-skipped").textContent  = skipped;
       document.getElementById("stat-pct").textContent      = pct + "%";
+      document.getElementById("total-students-badge").textContent = ranked.length + " students";
 
-      document.getElementById("total-students-badge").textContent = `${board.length} students`;
-      const tbody = document.getElementById("leaderboard-body");
+      var medals = { 1:"🥇", 2:"🥈", 3:"🥉" };
+      var tbody  = document.getElementById("leaderboard-body");
       tbody.innerHTML = "";
-      board.forEach(row => {
-        const isMe   = row.student_id === student.id;
-        const rowPct = Math.round((row.score / row.total) * 100);
-        const tr     = document.createElement("tr");
-        if (isMe) tr.classList.add("highlight-me");
-        if (row.rank <= 3) tr.classList.add(`rank-${row.rank}`);
-        tr.innerHTML = `
-          <td class="rank-cell">${medals[row.rank] || ""} ${row.rank}</td>
-          <td>${row.student_name} ${isMe ? '<span class="badge badge-gold" style="font-size:0.68rem;margin-left:4px;">You</span>' : ""}</td>
-          <td><strong>${row.score}</strong> / ${row.total}</td>
-          <td>${rowPct}%</td>
-        `;
+      ranked.forEach(function(row) {
+        var isMe   = row.student_id === student.id;
+        var rowPct = row.total > 0 ? Math.round((row.score / row.total) * 100) : 0;
+        var tr = document.createElement("tr");
+        if (isMe) tr.style.background = "rgba(200,153,42,0.08)";
+        tr.innerHTML =
+          "<td>" + (medals[row.rank] || "") + " " + row.rank + "</td>" +
+          "<td>" + row.student_name + (isMe ? ' <span class="badge badge-gold" style="font-size:0.68rem;margin-left:4px;">You</span>' : "") + "</td>" +
+          "<td><strong>" + row.score + "</strong> / " + row.total + "</td>" +
+          "<td>" + rowPct + "%</td>";
         tbody.appendChild(tr);
       });
-    } catch(err) {
-      document.getElementById("loading-state").innerHTML =
-        `<div class="alert alert-error" style="margin:2rem auto;max-width:400px;">❌ Failed to load results. Please refresh.</div>`;
-      console.error(err);
-    }
-  })();
+    })
+    .catch(function(err) {
+      showError("❌ Error: " + err.message);
+    });
+})();
 </script>
 </body>
 </html>
